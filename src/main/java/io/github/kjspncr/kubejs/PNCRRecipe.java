@@ -1,4 +1,6 @@
-package io.github.kjspncr.kubejs.utils;
+package io.github.kjspncr.kubejs;
+
+import org.checkerframework.checker.units.qual.min;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -9,13 +11,37 @@ import dev.latvian.mods.kubejs.fluid.InputFluid;
 import dev.latvian.mods.kubejs.item.InputItem;
 import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
 import dev.latvian.mods.kubejs.recipe.RecipeJS;
+import dev.latvian.mods.kubejs.recipe.RecipeKey;
 import dev.latvian.mods.kubejs.recipe.RecipesEventJS;
+import dev.latvian.mods.kubejs.recipe.component.BooleanComponent;
+import dev.latvian.mods.kubejs.recipe.component.NumberComponent;
+import dev.latvian.mods.kubejs.recipe.component.RecipeComponentBuilder;
+import dev.latvian.mods.kubejs.recipe.component.RecipeComponentBuilderMap;
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.util.ConsoleJS;
+import io.github.kjspncr.kubejs.utils.PneumaticcraftInputFluid;
 import me.desht.pneumaticcraft.api.crafting.ingredient.FluidIngredient;
 import net.minecraft.util.GsonHelper;
 import net.minecraftforge.fluids.FluidStack;
 
-public class SpecialRecipe extends RecipeJS {
+public class PNCRRecipe extends RecipeJS {
+
+    public static RecipeKey<Boolean> EXOTHERMIC = BooleanComponent.BOOLEAN.key("exothermic").optional(false);
+    public static RecipeKey<Float> PRESSURE = NumberComponent.FLOAT.key("pressure").optional(0F);
+
+    protected static RecipeKey<Integer> MIN_TEMP = NumberComponent.ANY_INT.key("min_temp").optional(0);
+    protected static RecipeKey<Integer> MAX_TEMP = NumberComponent.ANY_INT.key("max_temp").optional(0);
+    public static RecipeKey<RecipeComponentBuilderMap> TEMPERATURE = new RecipeComponentBuilder(2)
+            .add(MIN_TEMP)
+            .add(MAX_TEMP)
+            .key("temperature")
+            .optional(RecipeComponentBuilderMap.EMPTY);
+
+    // Used by ThermoPlant, maybe have subclasses with setters?
+    public static RecipeKey<Float> AIR_USE_MULTIPLIER = NumberComponent.ANY_FLOAT.key("air_use_multiplier")
+            .optional(1f);
+    public static RecipeKey<Float> SPEED = NumberComponent.ANY_FLOAT.key("speed").optional(1f);
+
     @Override
     public JsonElement writeInputItem(InputItem value) {
         if (value.count > 1) {
@@ -75,5 +101,39 @@ public class SpecialRecipe extends RecipeJS {
         }
         ConsoleJS.SERVER.warn("Unknown input fluid %s of type %s".formatted(from, from.getClass()));
         return PneumaticcraftInputFluid.EMPTY;
+    }
+
+    @Info("Sets this recipe to be exothermic.")
+    public RecipeJS exothermic() {
+        return setValue(PNCRRecipe.EXOTHERMIC, true);
+    }
+
+    @Info("Sets the minimum pressure required for this recipe.")
+    public RecipeJS pressure(float pressure) {
+        return setValue(PNCRRecipe.PRESSURE, pressure);
+    }
+
+    // @Info("Sets the minimum temperature required for this recipe.")
+    // public RecipeJS min_temp(int min_temp) {
+    // RecipeComponentBuilderMap temp = getValue(PNCRRecipe.TEMPERATURE);
+    // temp.put(PNCRRecipe.MIN_TEMP, min_temp);
+    // return setValue(PNCRRecipe.TEMPERATURE, temp);
+    // }
+
+    // @Info("Sets the maximum temperature required for this recipe.")
+    // public RecipeJS max_temp(int max_temp) {
+    // RecipeComponentBuilderMap temp = getValue(PNCRRecipe.TEMPERATURE);
+    // temp.put(PNCRRecipe.MIN_TEMP, max_temp);
+    // return setValue(PNCRRecipe.TEMPERATURE, temp);
+    // }
+
+    @Info("Sets the air use multiplier for this recipe.")
+    public RecipeJS air_use_multiplier(float air_use_multiplier) {
+        return setValue(PNCRRecipe.AIR_USE_MULTIPLIER, air_use_multiplier);
+    }
+
+    @Info("Sets the processing speed for this recipe.")
+    public RecipeJS speed(float speed) {
+        return setValue(PNCRRecipe.SPEED, speed);
     }
 }
