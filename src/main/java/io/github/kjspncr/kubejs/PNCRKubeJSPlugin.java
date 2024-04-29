@@ -13,7 +13,7 @@ public class PNCRKubeJSPlugin extends KubeJSPlugin {
                 .register(PneumaticCraftRecipeTypes.EXPLOSION_CRAFTING, ExplosionCraftingRecipeSchema.SCHEMA)
                 .register(PneumaticCraftRecipeTypes.PRESSURE_CHAMBER, PressureChamberRecipeSchema.SCHEMA)
                 .register(PneumaticCraftRecipeTypes.REFINERY, RefineryRecipeSchema.SCHEMA)
-                .register(PneumaticCraftRecipeTypes.THERMO_PLANT, ThermoPlantRecipeType.SCHEMA)
+                .register(PneumaticCraftRecipeTypes.THERMO_PLANT, ThermoPlantRecipeSchema.SCHEMA)
         // .register("amadron", AmadronRecipeSchema.SCHEMA)
         ;
     }
