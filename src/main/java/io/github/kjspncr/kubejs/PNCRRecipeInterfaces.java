@@ -1,5 +1,7 @@
 package io.github.kjspncr.kubejs;
 
+import org.apache.commons.lang3.NotImplementedException;
+
 import dev.latvian.mods.kubejs.recipe.RecipeJS;
 import dev.latvian.mods.kubejs.recipe.RecipeKey;
 import dev.latvian.mods.kubejs.recipe.component.BooleanComponent;
@@ -18,9 +20,34 @@ public class PNCRRecipeInterfaces {
         public <T> RecipeJS setValue(RecipeKey<T> key, T value);
     }
 
+    public static RecipeKey<Float> AIR_USE_MULTIPLIER = NumberComponent.ANY_FLOAT.key("air_use_multiplier")
+            .optional(1f);
+
+    public interface AllowsAirUseMultiplier extends RecipeJSInterface {
+        @Info("Sets the air use multiplier for this recipe.")
+        default public RecipeJS air_use_multiplier(float air_use_multiplier) {
+            return setValue(AIR_USE_MULTIPLIER, air_use_multiplier);
+        }
+    }
+
+    protected static RecipeKey<Float> LIMIT = NumberComponent.FLOAT.key("limit");
+    protected static RecipeKey<Float> MULTIPLIER = NumberComponent.FLOAT.key("multiplier");
+    public static RecipeKey<RecipeComponentBuilderMap> BONUS_OUTPUT = new RecipeComponentBuilder(2)
+            .add(LIMIT)
+            .add(MULTIPLIER)
+            .key("bonus_output")
+            .optional(RecipeComponentBuilderMap.EMPTY);
+
+    public interface AllowsBonusOutput extends RecipeJSInterface {
+        @Info("Set bonus output on this recipe. Not implemented.")
+        default public RecipeJS bonus_output() {
+            throw new NotImplementedException();
+        }
+    }
+
     public static RecipeKey<Boolean> EXOTHERMIC = BooleanComponent.BOOLEAN.key("exothermic").optional(false);
 
-    public interface AllowsExothermic extends PNCRRecipeInterfaces.RecipeJSInterface {
+    public interface AllowsExothermic extends RecipeJSInterface {
         @Info("Sets this recipe to be exothermic.")
         default public RecipeJS exothermic() {
             return setValue(PNCRRecipeInterfaces.EXOTHERMIC, true);
@@ -33,6 +60,15 @@ public class PNCRRecipeInterfaces {
         @Info("Sets the minimum pressure required for this recipe.")
         default public RecipeJS pressure(float pressure) {
             return setValue(PRESSURE, pressure);
+        }
+    }
+
+    public static RecipeKey<Float> SPEED = NumberComponent.ANY_FLOAT.key("speed").optional(1f);
+
+    public interface AllowsSpeed extends RecipeJSInterface {
+        @Info("Sets the processing speed for this recipe.")
+        default public RecipeJS speed(float speed) {
+            return setValue(SPEED, speed);
         }
     }
 
@@ -58,22 +94,12 @@ public class PNCRRecipeInterfaces {
         }
     }
 
-    public static RecipeKey<Float> AIR_USE_MULTIPLIER = NumberComponent.ANY_FLOAT.key("air_use_multiplier")
-            .optional(1f);
+    public static RecipeKey<Integer> TIME = NumberComponent.INT.key("time").optional(20);
 
-    public interface AllowsAirUseMultiplier extends RecipeJSInterface {
-        @Info("Sets the air use multiplier for this recipe.")
-        default public RecipeJS air_use_multiplier(float air_use_multiplier) {
-            return setValue(AIR_USE_MULTIPLIER, air_use_multiplier);
-        }
-    }
-
-    public static RecipeKey<Float> SPEED = NumberComponent.ANY_FLOAT.key("speed").optional(1f);
-
-    public interface AllowsSpeed extends RecipeJSInterface {
-        @Info("Sets the processing speed for this recipe.")
-        default public RecipeJS speed(float speed) {
-            return setValue(SPEED, speed);
+    public interface AllowsTime extends RecipeJSInterface {
+        @Info("Sets the processing time in ticks required for this recipe.")
+        default public RecipeJS time(int time) {
+            return setValue(TIME, time);
         }
     }
 
