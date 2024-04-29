@@ -11,7 +11,7 @@ version = "${version}"
 displayName = "KubeJS PneumaticCraft"
 logoFile="icon.png"
 # credits="Thanks to FooterMan for the KubeJS Addon Template!"
-authors="FooterMan!"
+authors="FooterMan,Omgimanerd"
 description = '''
 KubeJS Addon for PneumaticCraft support.
 '''
