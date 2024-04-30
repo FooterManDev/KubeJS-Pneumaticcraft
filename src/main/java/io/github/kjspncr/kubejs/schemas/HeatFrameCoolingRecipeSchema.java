@@ -18,7 +18,7 @@ public interface HeatFrameCoolingRecipeSchema {
     RecipeKey<Integer> MAX_TEMP = NumberComponent.INT.key("max_temp")
             .optional(273).alwaysWrite();
 
-    public class HeatFrameRecipeJS extends PNCRRecipe implements AllowsBonusOutput {
+    public class HeatFrameRecipeJS extends PNCRRecipe implements AllowsBonusOutput<HeatFrameRecipeJS> {
     }
 
     RecipeSchema SCHEMA = new RecipeSchema(HeatFrameRecipeJS.class, HeatFrameRecipeJS::new,

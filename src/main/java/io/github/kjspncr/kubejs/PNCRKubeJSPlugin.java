@@ -9,9 +9,10 @@ public class PNCRKubeJSPlugin extends KubeJSPlugin {
     @Override
     public void registerRecipeSchemas(RegisterRecipeSchemasEvent event) {
         event.namespace("pneumaticcraft")
-                // .register("amadron", AmadronRecipeSchema.SCHEMA)
+                .register(PneumaticCraftRecipeTypes.AMADRON_OFFERS, AmadronOffersRecipeSchema.SCHEMA)
                 .register(PneumaticCraftRecipeTypes.ASSEMBLY_DRILL, AssemblyDrillRecipeSchema.SCHEMA)
                 .register(PneumaticCraftRecipeTypes.ASSEMBLY_LASER, AssemblyLaserRecipeSchema.SCHEMA)
+                .register(PneumaticCraftRecipeTypes.ASSEMBLY_DRILL_LASER, AssemblyDrillLaserRecipeSchema.SCHEMA)
                 .register(PneumaticCraftRecipeTypes.EXPLOSION_CRAFTING, ExplosionCraftingRecipeSchema.SCHEMA)
                 .register(PneumaticCraftRecipeTypes.FLUID_MIXER, FluidMixerRecipeSchema.SCHEMA)
                 .register(PneumaticCraftRecipeTypes.FUEL_QUALITY, FuelQualityRecipeSchema.SCHEMA)

@@ -48,11 +48,11 @@ public class TemperatureRange implements RecipeComponent<TemperatureRange> {
     @Override
     public JsonElement write(RecipeJS recipe, TemperatureRange value) {
         var json = new JsonObject();
-        if (min_temp != null) {
-            json.addProperty("min_temp", min_temp.toString());
+        if (value.min_temp != null) {
+            json.addProperty("min_temp", value.min_temp);
         }
-        if (max_temp != null) {
-            json.addProperty("max_temp", max_temp.toString());
+        if (value.max_temp != null) {
+            json.addProperty("max_temp", value.max_temp);
         }
         return json;
     }

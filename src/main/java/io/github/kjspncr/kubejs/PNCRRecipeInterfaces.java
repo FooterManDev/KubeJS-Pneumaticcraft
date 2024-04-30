@@ -2,17 +2,28 @@ package io.github.kjspncr.kubejs;
 
 import org.apache.commons.lang3.NotImplementedException;
 
+import dev.latvian.mods.kubejs.fluid.EmptyFluidStackJS;
+import dev.latvian.mods.kubejs.fluid.InputFluid;
+import dev.latvian.mods.kubejs.fluid.OutputFluid;
+import dev.latvian.mods.kubejs.item.InputItem;
+import dev.latvian.mods.kubejs.item.OutputItem;
 import dev.latvian.mods.kubejs.recipe.RecipeJS;
 import dev.latvian.mods.kubejs.recipe.RecipeKey;
 import dev.latvian.mods.kubejs.recipe.component.BooleanComponent;
+import dev.latvian.mods.kubejs.recipe.component.FluidComponents;
+import dev.latvian.mods.kubejs.recipe.component.ItemComponents;
 import dev.latvian.mods.kubejs.recipe.component.NumberComponent;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentBuilder;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentBuilderMap;
 import dev.latvian.mods.kubejs.typings.Info;
+import io.github.kjspncr.kubejs.utils.TemperatureRange;
 
 /*
  * Public container class that contains all optional recipe keys and their setters.
  * Recipe schemas will define a local class instance that only implements the interfaces that they need.
+ *
+ * The template argument type allows for the implementing class to reference itself so that
+ * the methods provided by the interface are chainable.
  */
 public class PNCRRecipeInterfaces {
 
@@ -23,10 +34,12 @@ public class PNCRRecipeInterfaces {
     public static RecipeKey<Float> AIR_USE_MULTIPLIER = NumberComponent.ANY_FLOAT.key("air_use_multiplier")
             .optional(1f);
 
-    public interface AllowsAirUseMultiplier extends RecipeJSInterface {
+    public interface AllowsAirUseMultiplier<T> extends RecipeJSInterface {
+        @SuppressWarnings("unchecked")
         @Info("Sets the air use multiplier for this recipe.")
-        default public RecipeJS air_use_multiplier(float air_use_multiplier) {
-            return setValue(AIR_USE_MULTIPLIER, air_use_multiplier);
+        default public T air_use_multiplier(float air_use_multiplier) {
+            setValue(AIR_USE_MULTIPLIER, air_use_multiplier);
+            return (T) this;
         }
     }
 
@@ -38,69 +51,156 @@ public class PNCRRecipeInterfaces {
             .key("bonus_output")
             .optional(RecipeComponentBuilderMap.EMPTY);
 
-    public interface AllowsBonusOutput extends RecipeJSInterface {
+    public interface AllowsBonusOutput<T> extends RecipeJSInterface {
         @Info("Set bonus output on this recipe. Not implemented.")
-        default public RecipeJS bonus_output() {
+        default public T bonus_output() {
             throw new NotImplementedException();
         }
     }
 
     public static RecipeKey<Boolean> EXOTHERMIC = BooleanComponent.BOOLEAN.key("exothermic").optional(false);
 
-    public interface AllowsExothermic extends RecipeJSInterface {
+    public interface AllowsExothermic<T> extends RecipeJSInterface {
+        @SuppressWarnings("unchecked")
         @Info("Sets this recipe to be exothermic.")
-        default public RecipeJS exothermic() {
-            return setValue(PNCRRecipeInterfaces.EXOTHERMIC, true);
+        default public T exothermic() {
+            setValue(PNCRRecipeInterfaces.EXOTHERMIC, true);
+            return (T) this;
         }
     }
 
     public static RecipeKey<Float> PRESSURE = NumberComponent.FLOAT.key("pressure").optional(0F);
 
-    public interface AllowsPressure extends RecipeJSInterface {
+    public interface AllowsPressure<T> extends RecipeJSInterface {
+        @SuppressWarnings("unchecked")
         @Info("Sets the minimum pressure required for this recipe.")
-        default public RecipeJS pressure(float pressure) {
-            return setValue(PRESSURE, pressure);
+        default public T pressure(float pressure) {
+            setValue(PRESSURE, pressure);
+            return (T) this;
         }
     }
 
     public static RecipeKey<Float> SPEED = NumberComponent.ANY_FLOAT.key("speed").optional(1f);
 
-    public interface AllowsSpeed extends RecipeJSInterface {
+    public interface AllowsSpeed<T> extends RecipeJSInterface {
+        @SuppressWarnings("unchecked")
         @Info("Sets the processing speed for this recipe.")
-        default public RecipeJS speed(float speed) {
-            return setValue(SPEED, speed);
+        default public T speed(float speed) {
+            setValue(SPEED, speed);
+            return (T) this;
         }
     }
 
-    protected static RecipeKey<Integer> MIN_TEMP = NumberComponent.ANY_INT.key("min_temp")
-            .optional(0);
-    protected static RecipeKey<Integer> MAX_TEMP = NumberComponent.ANY_INT.key("max_temp")
-            .optional(0);
-    public static RecipeKey<RecipeComponentBuilderMap> TEMPERATURE = new RecipeComponentBuilder(2)
-            .add(MIN_TEMP)
-            .add(MAX_TEMP)
-            .key("temperature")
-            .optional(RecipeComponentBuilderMap.EMPTY);
+    public static RecipeKey<TemperatureRange> TEMPERATURE = new TemperatureRange().key("temperature")
+            .optional(TemperatureRange.EMPTY);
 
-    public interface AllowsTemperature extends RecipeJSInterface {
+    public interface AllowsTemperature<T> extends RecipeJSInterface {
+        @SuppressWarnings("unchecked")
         @Info("Sets the minimum temperature required for this recipe.")
-        default public RecipeJS min_temp(int min_temp) {
-            return setValue(MIN_TEMP, min_temp);
+        default public T min_temp(int min_temp) {
+            setValue(TEMPERATURE, new TemperatureRange(min_temp, null));
+            return (T) this;
         }
 
+        @SuppressWarnings("unchecked")
         @Info("Sets the maximum temperature required for this recipe.")
-        default public RecipeJS max_temp(int max_temp) {
-            return setValue(MAX_TEMP, max_temp);
+        default public T max_temp(int max_temp) {
+            setValue(TEMPERATURE, new TemperatureRange(null, max_temp));
+            return (T) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Info("Sets the temperature range required for this recipe.")
+        default public T temperature(int min_temp, int max_temp) {
+            setValue(TEMPERATURE, new TemperatureRange(min_temp, max_temp));
+            return (T) this;
         }
     }
 
     public static RecipeKey<Integer> TIME = NumberComponent.INT.key("time").optional(20);
 
-    public interface AllowsTime extends RecipeJSInterface {
+    public interface AllowsTime<T> extends RecipeJSInterface {
+        @SuppressWarnings("unchecked")
         @Info("Sets the processing time in ticks required for this recipe.")
-        default public RecipeJS time(int time) {
-            return setValue(TIME, time);
+        default public T time(int time) {
+            setValue(TIME, time);
+            return (T) this;
         }
     }
 
+    public static RecipeKey<InputFluid> FLUID_INPUT = FluidComponents.INPUT.key("fluid_input")
+            .optional(EmptyFluidStackJS.INSTANCE);
+    public static RecipeKey<InputItem> ITEM_INPUT = ItemComponents.INPUT.key("item_input")
+            .optional(InputItem.EMPTY);
+
+    // RecipeSchemas that take one item, one fluid, or exactly one of each.
+    public interface AllowsItemOrFluidInput<T> extends RecipeJSInterface {
+        @SuppressWarnings("unchecked")
+        @Info("Sets the recipe's inputs.")
+        default public T inputs(InputItem item) {
+            setValue(ITEM_INPUT, item);
+            return (T) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Info("Sets the recipe's inputs.")
+        default public T inputs(InputFluid fluid) {
+            setValue(FLUID_INPUT, fluid);
+            return (T) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Info("Sets the recipe's inputs.")
+        default public T inputs(InputFluid fluid, InputItem item) {
+            setValue(ITEM_INPUT, item);
+            setValue(FLUID_INPUT, fluid);
+            return (T) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Info("Sets the recipe's inputs.")
+        default public T inputs(InputItem item, InputFluid fluid) {
+            setValue(ITEM_INPUT, item);
+            setValue(FLUID_INPUT, fluid);
+            return (T) this;
+        }
+    }
+
+    public static RecipeKey<OutputFluid> FLUID_OUTPUT = FluidComponents.OUTPUT.key("fluid_output")
+            .optional(EmptyFluidStackJS.INSTANCE);
+    public static RecipeKey<OutputItem> ITEM_OUTPUT = ItemComponents.OUTPUT.key("item_output")
+            .optional(OutputItem.EMPTY);
+
+    // RecipeSchemas that output one item, one fluid, or exactly one of each.
+    public interface AllowsItemOrFluidOutput<T> extends RecipeJSInterface {
+        @SuppressWarnings("unchecked")
+        @Info("Sets the recipe's outputs.")
+        default public T outputs(OutputFluid fluid) {
+            setValue(FLUID_OUTPUT, fluid);
+            return (T) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Info("Sets the recipe's outputs.")
+        default public T outputs(OutputItem item) {
+            setValue(ITEM_OUTPUT, item);
+            return (T) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Info("Sets the recipe's outputs.")
+        default public T outputs(OutputItem item, OutputFluid fluid) {
+            setValue(ITEM_OUTPUT, item);
+            setValue(FLUID_OUTPUT, fluid);
+            return (T) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Info("Sets the recipe's outputs.")
+        default public T outputs(OutputFluid fluid, OutputItem item) {
+            setValue(ITEM_OUTPUT, item);
+            setValue(FLUID_OUTPUT, fluid);
+            return (T) this;
+        }
+    }
 }

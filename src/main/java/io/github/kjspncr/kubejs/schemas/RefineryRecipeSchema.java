@@ -13,7 +13,7 @@ public interface RefineryRecipeSchema {
     RecipeKey<InputFluid> INPUT = FluidComponents.INPUT.key("input");
     RecipeKey<OutputFluid[]> RESULTS = FluidComponents.OUTPUT_ARRAY.key("results");
 
-    public class RefineryRecipeJS extends PNCRRecipe implements AllowsTemperature {
+    public class RefineryRecipeJS extends PNCRRecipe implements AllowsTemperature<RefineryRecipeJS> {
     }
 
     RecipeSchema SCHEMA = new RecipeSchema(
