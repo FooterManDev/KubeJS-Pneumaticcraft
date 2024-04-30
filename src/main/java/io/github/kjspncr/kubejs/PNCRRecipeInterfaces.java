@@ -1,7 +1,5 @@
 package io.github.kjspncr.kubejs;
 
-import org.apache.commons.lang3.NotImplementedException;
-
 import dev.latvian.mods.kubejs.fluid.EmptyFluidStackJS;
 import dev.latvian.mods.kubejs.fluid.InputFluid;
 import dev.latvian.mods.kubejs.fluid.OutputFluid;
@@ -13,9 +11,8 @@ import dev.latvian.mods.kubejs.recipe.component.BooleanComponent;
 import dev.latvian.mods.kubejs.recipe.component.FluidComponents;
 import dev.latvian.mods.kubejs.recipe.component.ItemComponents;
 import dev.latvian.mods.kubejs.recipe.component.NumberComponent;
-import dev.latvian.mods.kubejs.recipe.component.RecipeComponentBuilder;
-import dev.latvian.mods.kubejs.recipe.component.RecipeComponentBuilderMap;
 import dev.latvian.mods.kubejs.typings.Info;
+import io.github.kjspncr.kubejs.utils.BonusOutput;
 import io.github.kjspncr.kubejs.utils.TemperatureRange;
 
 /*
@@ -43,18 +40,15 @@ public class PNCRRecipeInterfaces {
         }
     }
 
-    protected static RecipeKey<Float> LIMIT = NumberComponent.FLOAT.key("limit");
-    protected static RecipeKey<Float> MULTIPLIER = NumberComponent.FLOAT.key("multiplier");
-    public static RecipeKey<RecipeComponentBuilderMap> BONUS_OUTPUT = new RecipeComponentBuilder(2)
-            .add(LIMIT)
-            .add(MULTIPLIER)
-            .key("bonus_output")
-            .optional(RecipeComponentBuilderMap.EMPTY);
+    public static RecipeKey<BonusOutput> BONUS_OUTPUT = BonusOutput.EMPTY.key("bonus_output")
+            .optional(BonusOutput.EMPTY);
 
     public interface AllowsBonusOutput<T> extends RecipeJSInterface {
-        @Info("Set bonus output on this recipe. Not implemented.")
-        default public T bonus_output() {
-            throw new NotImplementedException();
+        @SuppressWarnings("unchecked")
+        @Info("Set bonus output on this recipe.")
+        default public T bonus_output(float limit, float multiplier) {
+            setValue(BONUS_OUTPUT, new BonusOutput(limit, multiplier));
+            return (T) this;
         }
     }
 
@@ -91,7 +85,7 @@ public class PNCRRecipeInterfaces {
         }
     }
 
-    public static RecipeKey<TemperatureRange> TEMPERATURE = new TemperatureRange().key("temperature")
+    public static RecipeKey<TemperatureRange> TEMPERATURE = TemperatureRange.EMPTY.key("temperature")
             .optional(TemperatureRange.EMPTY);
 
     public interface AllowsTemperature<T> extends RecipeJSInterface {

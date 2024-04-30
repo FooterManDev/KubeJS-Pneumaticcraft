@@ -1,7 +1,5 @@
 package io.github.kjspncr.kubejs.utils;
 
-import javax.annotation.Nullable;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -9,36 +7,9 @@ import dev.latvian.mods.kubejs.recipe.RecipeJS;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import net.minecraft.util.GsonHelper;
 
-public class TemperatureRange implements RecipeComponent<TemperatureRange> {
+public record TemperatureRange(Integer min_temp, Integer max_temp) implements RecipeComponent<TemperatureRange> {
 
-    public static TemperatureRange EMPTY = new TemperatureRange();
-
-    @Nullable
-    private Integer min_temp;
-
-    @Nullable
-    private Integer max_temp;
-
-    public TemperatureRange() {
-    }
-
-    public TemperatureRange(Integer min_temp, Integer max_temp) {
-        this.min_temp = min_temp;
-        this.max_temp = max_temp;
-    }
-
-    public void min_temp(Integer min_temp) {
-        this.min_temp = min_temp;
-    }
-
-    public void max_temp(Integer max_temp) {
-        this.max_temp = max_temp;
-    }
-
-    public void temperature(Integer min_temp, Integer max_temp) {
-        min_temp(min_temp);
-        max_temp(max_temp);
-    }
+    public static TemperatureRange EMPTY = new TemperatureRange(null, null);
 
     @Override
     public Class<?> componentClass() {
