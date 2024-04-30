@@ -11,19 +11,18 @@ import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
 import dev.latvian.mods.kubejs.recipe.RecipeJS;
 import dev.latvian.mods.kubejs.recipe.RecipesEventJS;
 import dev.latvian.mods.kubejs.util.ConsoleJS;
-import me.desht.pneumaticcraft.api.crafting.ingredient.FluidIngredient;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 
 public class AmadronRecipe extends RecipeJS {
     @Override
     public JsonElement writeInputItem(InputItem value) {
-            var json = new JsonObject();
-            json.addProperty("type", "ITEM");
-            json.addProperty("id", value.ingredient.kjs$getFirst().kjs$getId());
-            json.addProperty("amount", value.count);
-            json.remove("item");
-            return json;
+        var json = new JsonObject();
+        json.addProperty("type", "ITEM");
+        json.addProperty("id", value.ingredient.kjs$getFirst().kjs$getId());
+        json.addProperty("amount", value.count);
+        json.remove("item");
+        return json;
     }
 
     @Override
@@ -36,18 +35,19 @@ public class AmadronRecipe extends RecipeJS {
 
             return super.readInputItem(from);
         } catch (Exception e) {
-            ConsoleJS.SERVER.error("[%s] Failed to read Inputs from %s".formatted(type.id, from), e, RecipesEventJS.SKIP_ERROR);
+            ConsoleJS.SERVER.error("[%s] Failed to read Inputs from %s".formatted(type.id, from), e,
+                    RecipesEventJS.SKIP_ERROR);
             return InputItem.EMPTY;
         }
     }
 
     @Override
     public JsonElement writeOutputItem(OutputItem value) {
-            var json = new JsonObject();
-            json.addProperty("type", "ITEM");
-            json.addProperty("id", value.item.kjs$getId());
-            json.addProperty("amount", value.getCount());
-            return json;
+        var json = new JsonObject();
+        json.addProperty("type", "ITEM");
+        json.addProperty("id", value.item.kjs$getId());
+        json.addProperty("amount", value.getCount());
+        return json;
     }
 
     @Override
@@ -60,7 +60,8 @@ public class AmadronRecipe extends RecipeJS {
 
             return OutputItem.of(from);
         } catch (Exception e) {
-            ConsoleJS.SERVER.error("[%s] Failed to read Inputs from %s".formatted(type.id, from), e, RecipesEventJS.SKIP_ERROR);
+            ConsoleJS.SERVER.error("[%s] Failed to read Inputs from %s".formatted(type.id, from), e,
+                    RecipesEventJS.SKIP_ERROR);
             return OutputItem.EMPTY;
         }
     }
@@ -84,7 +85,8 @@ public class AmadronRecipe extends RecipeJS {
                 return (InputFluid) j.get("id");
             }
         } catch (Exception e) {
-            ConsoleJS.SERVER.error("[%s] Failed to read Fluid input from %s".formatted(type.id, from), e, RecipesEventJS.SKIP_ERROR);
+            ConsoleJS.SERVER.error("[%s] Failed to read Fluid input from %s".formatted(type.id, from), e,
+                    RecipesEventJS.SKIP_ERROR);
         }
         return super.readInputFluid(from);
     }
@@ -108,7 +110,8 @@ public class AmadronRecipe extends RecipeJS {
                 return (OutputFluid) j.get("id");
             }
         } catch (Exception e) {
-            ConsoleJS.SERVER.error("[%s] Failed to read Fluid output from %s".formatted(type.id, from), e, RecipesEventJS.SKIP_ERROR);
+            ConsoleJS.SERVER.error("[%s] Failed to read Fluid output from %s".formatted(type.id, from), e,
+                    RecipesEventJS.SKIP_ERROR);
         }
         return super.readOutputFluid(from);
     }

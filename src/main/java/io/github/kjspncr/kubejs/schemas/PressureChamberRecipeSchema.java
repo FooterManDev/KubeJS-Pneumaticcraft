@@ -13,7 +13,7 @@ public interface PressureChamberRecipeSchema {
     RecipeKey<InputItem[]> INPUTS = ItemComponents.INPUT_ARRAY.key("inputs");
     RecipeKey<OutputItem[]> RESULTS = ItemComponents.OUTPUT_ARRAY.key("results");
 
-    public class PressureChamberRecipeJS extends PNCRRecipe implements AllowsPressure {
+    public class PressureChamberRecipeJS extends PNCRRecipe implements AllowsPressure<PressureChamberRecipeJS> {
     }
 
     RecipeSchema SCHEMA = new RecipeSchema(PressureChamberRecipeJS.class, PressureChamberRecipeJS::new,
