@@ -2,6 +2,8 @@ package io.github.kjspncr.kubejs;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import dev.architectury.hooks.fluid.forge.FluidStackHooksForge;
 import dev.latvian.mods.kubejs.fluid.FluidStackJS;
@@ -13,7 +15,13 @@ import dev.latvian.mods.kubejs.recipe.RecipesEventJS;
 import dev.latvian.mods.kubejs.util.ConsoleJS;
 import io.github.kjspncr.kubejs.utils.PNCRInputFluid;
 import me.desht.pneumaticcraft.api.crafting.ingredient.FluidIngredient;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
 /*
@@ -53,10 +61,16 @@ public class PNCRRecipe extends RecipeJS {
     public JsonElement writeInputFluid(InputFluid value) {
         if (value instanceof PNCRInputFluid fluid) {
             return fluid.ingredient().toJson();
-        } else if (value instanceof FluidIngredient fluid) {
-            return fluid.toJson();
         } else if (value instanceof FluidStackJS fluid) {
-            return fluid.toJson();
+            // Convert the FluidStackJS to a Pneumaticcraft FluidIngredient to use its JSON
+            // serialization functions.
+            ConsoleJS.SERVER.log("writeInputFluid() of FluidStackJS: %s".formatted(
+                    fluid.toJson()));
+            var intermediate = FluidStackHooksForge.toForge(fluid.getFluidStack());
+            ConsoleJS.SERVER.log("writeInputFluid() of FluidstackJS as forge: tag=%s fluid=%s"
+                    .formatted(intermediate.getTag(), intermediate.getFluid().toString()));
+            FluidIngredient f = FluidIngredient.of(intermediate);
+            return f.toJson();
         }
         ConsoleJS.SERVER.warn("Input fluid %s of type %s could not be serialized.".formatted(
                 value, value.getClass()));
@@ -67,20 +81,38 @@ public class PNCRRecipe extends RecipeJS {
     public InputFluid readInputFluid(Object from) {
         if (from instanceof PNCRInputFluid fluid) {
             return fluid;
-        } else if (from instanceof FluidIngredient fluid) {
-            return new PNCRInputFluid(fluid);
         } else if (from instanceof FluidStack fluid) {
             return new PNCRInputFluid(FluidIngredient.of(fluid));
         } else if (from instanceof FluidStackJS fluid) {
-            FluidIngredient f = FluidIngredient.of(FluidStackHooksForge.toForge(fluid.getFluidStack()));
+            FluidIngredient f = FluidIngredient.of(
+                    FluidStackHooksForge.toForge(fluid.getFluidStack()));
             return new PNCRInputFluid(f);
-        } else if (from instanceof JsonObject j) {
-            // TODO: this is potentially problematic because this calls
-            // ForgeRegistries.FLUIDS and the fluid registry is not available at startup
-            // This causes some recipe parsing errors on first load, which disappear after
-            // a /reload. As a hack, users can force call /reload when the server starts lol
-            FluidIngredient f = FluidIngredient.Serializer.INSTANCE.parse(j);
-            return new PNCRInputFluid(f);
+            // TODO implement custom handling for fluid tags, this is not easily supported
+            // by kubejs
+        } else if (from instanceof JsonObject json) {
+            int amount = GsonHelper.getAsInt(json, "amount", 0);
+            CompoundTag nbt = null;
+            if (json.has("nbt")) {
+                try {
+                    nbt = TagParser.parseTag(json.get("nbt").getAsString());
+                } catch (CommandSyntaxException e) {
+                    throw new JsonSyntaxException(e);
+                }
+            }
+            boolean fuzzyNBT = GsonHelper.getAsBoolean(json, "fuzzyNBT", false);
+            if (json.has("fluid")) {
+                ResourceLocation fluidId = new ResourceLocation(json.get("fluid").getAsString());
+                return new PNCRInputFluid(FluidIngredient.of(amount, nbt, fuzzyNBT, fluidId));
+            }
+            if (json.has("tag")) {
+                ResourceLocation rl = new ResourceLocation(json.get("tag").getAsString());
+                // Do not try and resolve the tag key with a registry lookup. Registries are not
+                // available at the time this addon is loaded.
+                TagKey<Fluid> tagKey = TagKey.create(Registries.FLUID, rl);
+                return new PNCRInputFluid(FluidIngredient.of(amount, nbt, fuzzyNBT, tagKey));
+            }
+            throw new JsonSyntaxException("Fluid ingredient %s must have 'fluid' or 'tag' field!"
+                    .formatted(json.toString()));
         }
         ConsoleJS.SERVER.warn("Unknown input fluid %s of type %s".formatted(from, from.getClass()));
         return PNCRInputFluid.EMPTY;
