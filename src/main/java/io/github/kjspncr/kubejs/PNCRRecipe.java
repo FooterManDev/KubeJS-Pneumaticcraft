@@ -64,14 +64,12 @@ public class PNCRRecipe extends RecipeJS {
         } else if (value instanceof FluidStackJS fluid) {
             // Convert the FluidStackJS to a Pneumaticcraft FluidIngredient to use its JSON
             // serialization functions.
-            ConsoleJS.SERVER.log("writeInputFluid() of FluidStackJS: %s".formatted(
-                    fluid.toJson()));
-            var intermediate = FluidStackHooksForge.toForge(fluid.getFluidStack());
-            ConsoleJS.SERVER.log("writeInputFluid() of FluidstackJS as forge: tag=%s fluid=%s"
-                    .formatted(intermediate.getTag(), intermediate.getFluid().toString()));
-            FluidIngredient f = FluidIngredient.of(intermediate);
+            FluidIngredient f = FluidIngredient.of(
+                    FluidStackHooksForge.toForge(fluid.getFluidStack()));
             return f.toJson();
         }
+        // TODO implement custom handling for fluid tags, this is not easily supported
+        // by kubejs, the inputfluid will be of type Ingredient maybe?
         ConsoleJS.SERVER.warn("Input fluid %s of type %s could not be serialized.".formatted(
                 value, value.getClass()));
         return FluidIngredient.EMPTY.toJson();
@@ -87,8 +85,6 @@ public class PNCRRecipe extends RecipeJS {
             FluidIngredient f = FluidIngredient.of(
                     FluidStackHooksForge.toForge(fluid.getFluidStack()));
             return new PNCRInputFluid(f);
-            // TODO implement custom handling for fluid tags, this is not easily supported
-            // by kubejs
         } else if (from instanceof JsonObject json) {
             int amount = GsonHelper.getAsInt(json, "amount", 0);
             CompoundTag nbt = null;
