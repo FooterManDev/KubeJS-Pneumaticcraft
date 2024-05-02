@@ -8,12 +8,8 @@ import me.desht.pneumaticcraft.api.crafting.ingredient.FluidIngredient;
  * allow it to interface with KubeJS's recipe registry.
  */
 public record PNCRInputFluid(FluidIngredient ingredient) implements InputFluid {
-    public static final PNCRInputFluid EMPTY = new PNCRInputFluid(FluidIngredient.EMPTY);
 
-    @Override
-    public boolean kjs$isEmpty() {
-        return ingredient.isEmpty();
-    }
+    public static final PNCRInputFluid EMPTY = new PNCRInputFluid(FluidIngredient.EMPTY);
 
     @Override
     public long kjs$getAmount() {
